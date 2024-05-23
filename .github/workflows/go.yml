@@ -28,5 +28,5 @@ jobs:
 
     - name: Start action
       env:
-        BDUSS: ${{ secrets.BDUSS }}
+        COOKIE: ${{ secrets.COOKIE }}
       run: go run main.go
