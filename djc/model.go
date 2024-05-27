@@ -55,8 +55,8 @@ type TaskList struct {
 				DtReceive    string      `json:"dtReceive"`
 				DtDeadline   string      `json:"dtDeadline"`
 				DtCommit     string      `json:"dtCommit"`
-				IsNew        int         `json:"isNew"`
-				TaskStatus   int         `json:"task_status"`
+				IsNew        interface{} `json:"isNew"`
+				TaskStatus   interface{} `json:"task_status"`
 			} `json:"day"`
 			LimitTime []struct {
 				IruleId       string      `json:"iruleId"`
