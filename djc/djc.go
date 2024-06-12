@@ -42,8 +42,6 @@ func (c *Client) Run() (logInfo string, err error) {
 	//执行每日抽奖
 	c.lottery()
 
-	return
-
 	result, err := c.djcGet("welink.usertask.swoole", "get_usertask_list", "", false)
 	if err != nil {
 		return
