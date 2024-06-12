@@ -24,7 +24,7 @@ func (c *Client) djcGet(service, opType, taskId string, isReceive bool) (result 
 		err = errors.New("djcGet计算sign出错:" + err.Error())
 		return
 	}
-	url := fmt.Sprintf("https://djcapp.game.qq.com/daoju/igw/main/?_service=%s&optype=%s&_app_id=1001&output_format=json&iAppId=1001&_app_id=1001%s&sDeviceID=%s&djcRequestId=%s-%d-%s&appVersion=153&p_tk=%s&osVersion=Android-28&ch=10003&sVersionName=v4.7.7.0&appSource=android&sDjcSign=%s",
+	url := fmt.Sprintf("https://djcapp.game.qq.com/daoju/igw/main/?_service=%s&optype=%s&_app_id=1001&output_format=json&iAppId=1001&_app_id=1001%s&sDeviceID=%s&djcRequestId=%s-%d-%s&appVersion=156&p_tk=%s&osVersion=Android-28&ch=10003&sVersionName=v4.8.0.0&appSource=android&sDjcSign=%s",
 		service, opType, iRuledId, DeviceId, DeviceId, timestamp, CreateRandomString(3), c.Ptk, sign)
 	result, err = c.httpGet(url)
 	return

@@ -39,6 +39,11 @@ func (c *Client) Run() (logInfo string, err error) {
 
 	c.getSignRules()
 
+	//执行每日抽奖
+	c.lottery()
+
+	return
+
 	result, err := c.djcGet("welink.usertask.swoole", "get_usertask_list", "", false)
 	if err != nil {
 		return
@@ -69,6 +74,9 @@ func (c *Client) Run() (logInfo string, err error) {
 				log.Printf("已跳过%s暂时无法自动完成", day.STask)
 				break
 			}
+		} else if day.SBtnDesc == "领取奖励" {
+			//领取兑换成功后的任务
+			c.receiveTask(fmt.Sprintf("%v", day.IruleId))
 		} else {
 			log.Printf("%s已完成\n", day.STask)
 		}
@@ -115,7 +123,7 @@ func (c *Client) Run() (logInfo string, err error) {
 func (c *Client) getBalance() (balance string, err error) {
 	timestamp := time.Now().UnixNano() / 1e6
 	sign, err := crypto.GetEncrypt(fmt.Sprintf("%s+%s+%v+153", c.OpenId, DeviceId, timestamp))
-	url := fmt.Sprintf("https://djcapp.game.qq.com/daoju/igw/main/?_service=app.bean.balance&iAppId=1001&_app_id=1001&sDeviceID=%s&djcRequestId=%s-%d-%s&appVersion=153&p_tk=%s&osVersion=Android-28&ch=10003&sVersionName=v4.7.7.0&appSource=android&sDjcSign=%s",
+	url := fmt.Sprintf("https://djcapp.game.qq.com/daoju/igw/main/?_service=app.bean.balance&iAppId=1001&_app_id=1001&sDeviceID=%s&djcRequestId=%s-%d-%s&appVersion=156&p_tk=%s&osVersion=Android-28&ch=10003&sVersionName=v4.8.0.0&appSource=android&sDjcSign=%s",
 		DeviceId, DeviceId, timestamp, CreateRandomString(3), c.Ptk, sign)
 	result, err := c.httpGet(url)
 	balance = jsoniter.Get(result, "data", "balance").ToString()
@@ -126,7 +134,7 @@ func (c *Client) getBalance() (balance string, err error) {
 func (c *Client) sign() (logInfo string, err error) {
 	timestamp := time.Now().UnixNano() / 1e6
 	sign, err := crypto.GetEncrypt(fmt.Sprintf("%s+%s+%v+153", c.OpenId, DeviceId, timestamp))
-	url1 := "https://comm.ams.game.qq.com/ams/ame/amesvr?ameVersion=0.3&sServiceType=dj&iActivityId=11117&sServiceDepartment=djc&set_info=newterminals&&appSource=android&appVersion=153&ch=10003&sDeviceID=" + DeviceId + "&osVersion=Android-28&p_tk=" + c.Ptk + "&sVersionName=v4.7.7.0"
+	url1 := "https://comm.ams.game.qq.com/ams/ame/amesvr?ameVersion=0.3&sServiceType=dj&iActivityId=11117&sServiceDepartment=djc&set_info=newterminals&&appSource=android&appVersion=156&ch=10003&sDeviceID=" + DeviceId + "&osVersion=Android-28&p_tk=" + c.Ptk + "&sVersionName=v4.8.0.0"
 	result, err := c.httpPost(url1, map[string]string{
 		"djcRequestId":       DeviceId + "-1711712807701-" + CreateRandomString(3),
 		"appVersion":         "153",
@@ -156,7 +164,7 @@ func (c *Client) sign() (logInfo string, err error) {
 func (c *Client) getSignAmount(iFlowId string) (err error) {
 	timestamp := time.Now().UnixNano() / 1e6
 	sign, err := crypto.GetEncrypt(fmt.Sprintf("%s+%s+%v+153", c.OpenId, DeviceId, timestamp))
-	url1 := "https://comm.ams.game.qq.com/ams/ame/amesvr?ameVersion=0.3&sServiceType=dj&iActivityId=11117&sServiceDepartment=djc&set_info=newterminals&w_ver=36&w_id=45&appSource=android&appVersion=153&ch=10003&sDeviceID=" + DeviceId + "&osVersion=Android-28&p_tk=" + c.Ptk + "&sVersionName=v4.7.7.0"
+	url1 := "https://comm.ams.game.qq.com/ams/ame/amesvr?ameVersion=0.3&sServiceType=dj&iActivityId=11117&sServiceDepartment=djc&set_info=newterminals&w_ver=36&w_id=45&appSource=android&appVersion=156&ch=10003&sDeviceID=" + DeviceId + "&osVersion=Android-28&p_tk=" + c.Ptk + "&sVersionName=v4.8.0.0"
 	result, err := c.httpPost(url1, map[string]string{
 		"djcRequestId":       DeviceId + "-1711712807701-" + CreateRandomString(3),
 		"appVersion":         "153",
@@ -182,7 +190,7 @@ func (c *Client) getSignAmount(iFlowId string) (err error) {
 func (c *Client) getSignTotalDays() (totalDays int) {
 	timestamp := time.Now().UnixNano() / 1e6
 	sign, _ := crypto.GetEncrypt(fmt.Sprintf("%s+%s+%v+153", c.OpenId, DeviceId, timestamp))
-	url1 := "https://comm.ams.game.qq.com/ams/ame/amesvr?ameVersion=0.3&sServiceType=dj&iActivityId=11117&sServiceDepartment=djc&set_info=newterminals&w_ver=36&w_id=45&appSource=android&appVersion=153&ch=10003&sDeviceID=" + DeviceId + "&osVersion=Android-28&p_tk=" + c.Ptk + "&sVersionName=v4.7.7.0"
+	url1 := "https://comm.ams.game.qq.com/ams/ame/amesvr?ameVersion=0.3&sServiceType=dj&iActivityId=11117&sServiceDepartment=djc&set_info=newterminals&w_ver=36&w_id=45&appSource=android&appVersion=156&ch=10003&sDeviceID=" + DeviceId + "&osVersion=Android-28&p_tk=" + c.Ptk + "&sVersionName=v4.8.0.0"
 	result, _ := c.httpPost(url1, map[string]string{
 		"djcRequestId":       DeviceId + "-1711712807701-" + CreateRandomString(3),
 		"appVersion":         "153",
@@ -209,7 +217,7 @@ func (c *Client) getSignTotalDays() (totalDays int) {
 func (c *Client) getSignRules() {
 	timestamp := time.Now().UnixNano() / 1e6
 	sign, _ := crypto.GetEncrypt(fmt.Sprintf("%s+%s+%v+153", c.OpenId, DeviceId, timestamp))
-	url1 := "https://djcapp.game.qq.com/daoju/igw/main/?_service=app.sign.rules&output_format=json&iAppId=1001&_app_id=1001&w_ver=36&w_id=45&sDeviceID=" + DeviceId + "&djcRequestId=" + DeviceId + "-" + strconv.Itoa(int(timestamp)) + "-" + CreateRandomString(3) + "&appVersion=153&p_tk=" + c.Ptk + "&osVersion=Android-28&ch=10003&sVersionName=v4.7.7.0&appSource=android&sDjcSign=" + sign
+	url1 := "https://djcapp.game.qq.com/daoju/igw/main/?_service=app.sign.rules&output_format=json&iAppId=1001&_app_id=1001&w_ver=36&w_id=45&sDeviceID=" + DeviceId + "&djcRequestId=" + DeviceId + "-" + strconv.Itoa(int(timestamp)) + "-" + CreateRandomString(3) + "&appVersion=156&p_tk=" + c.Ptk + "&osVersion=Android-28&ch=10003&sVersionName=v4.8.0.0&appSource=android&sDjcSign=" + sign
 	result, err := c.httpGet(url1)
 	if err != nil {
 		return
@@ -242,7 +250,7 @@ func (c *Client) getSignRules() {
 func (c *Client) doTodayTask(service, taskType string) {
 	timestamp := time.Now().UnixNano() / 1e6
 	sign, _ := crypto.GetEncrypt(fmt.Sprintf("%s+%s+%v+153", c.OpenId, DeviceId, timestamp))
-	result, err := c.httpGet(fmt.Sprintf("https://djcapp.game.qq.com/daoju/igw/main/?_service=%s&task_type=%s&_app_id=1001&output_format=json&iAppId=1001&_app_id=1001&sDeviceID=%s&djcRequestId=%s-%d-%s&appVersion=153&p_tk=%s&osVersion=Android-28&ch=10003&sVersionName=v4.7.7.0&appSource=android&sDjcSign=%s",
+	result, err := c.httpGet(fmt.Sprintf("https://djcapp.game.qq.com/daoju/igw/main/?_service=%s&task_type=%s&_app_id=1001&output_format=json&iAppId=1001&_app_id=1001&sDeviceID=%s&djcRequestId=%s-%d-%s&appVersion=156&p_tk=%s&osVersion=Android-28&ch=10003&sVersionName=v4.8.0.0&appSource=android&sDjcSign=%s",
 		service, taskType, DeviceId, DeviceId, timestamp, CreateRandomString(3), c.Ptk, sign))
 	if err != nil {
 		log.Println("执行今日任务失败", err)
@@ -302,7 +310,7 @@ func (c *Client) doLimitTask(taskId string) {
 func (c *Client) exchange(iGoodsSeqId string) {
 	timestamp := time.Now().UnixNano() / 1e6
 	sign, _ := crypto.GetEncrypt(fmt.Sprintf("%s+%s+%v+153", c.OpenId, DeviceId, timestamp))
-	url1 := "https://djcapp.game.qq.com/daoju/igw/main/?_service=app.role.bind_list&iAppId=1001&_app_id=1001&_biz_code=nba2k2&type=0&sDeviceID=" + DeviceId + "&djcRequestId=" + DeviceId + "-" + strconv.Itoa(int(timestamp)) + "-" + CreateRandomString(3) + "&appVersion=153&p_tk=" + c.Ptk + "&osVersion=Android-28&ch=10003&sVersionName=v4.7.7.0&appSource=android&sDjcSign=" + sign
+	url1 := "https://djcapp.game.qq.com/daoju/igw/main/?_service=app.role.bind_list&iAppId=1001&_app_id=1001&_biz_code=nba2k2&type=0&sDeviceID=" + DeviceId + "&djcRequestId=" + DeviceId + "-" + strconv.Itoa(int(timestamp)) + "-" + CreateRandomString(3) + "&appVersion=156&p_tk=" + c.Ptk + "&osVersion=Android-28&ch=10003&sVersionName=v4.8.0.0&appSource=android&sDjcSign=" + sign
 	result, err := c.httpGet(url1)
 	if err != nil {
 		log.Println("获取角色信息失败")
@@ -312,11 +320,36 @@ func (c *Client) exchange(iGoodsSeqId string) {
 	roleName := jsoniter.Get(result, "data", 0, "sRoleInfo", "roleName").ToString()
 
 	//兑换
-	url1 = "https://djcapp.game.qq.com/daoju/igw/main/?_service=buy.plug.swoole.judou&iAppId=1001&_app_id=1003&_output_fmt=1&_plug_id=9800&_from=app&iGoodsSeqId=" + iGoodsSeqId + "&iActionId=9002&iActionType=26&_biz_code=nba2k2&biz=nba2k2&iZone=30&lRoleId=" + roleId + "&rolename=" + roleName + "&p_tk=" + c.Ptk + "&_cs=2&sDeviceID=" + DeviceId + "&djcRequestId=" + DeviceId + "-" + strconv.Itoa(int(timestamp)) + "-" + CreateRandomString(3) + "&appVersion=153&p_tk=" + c.Ptk + "&osVersion=Android-28&ch=10003&sVersionName=v4.7.7.0&appSource=android&sDjcSign=" + sign
+	url1 = "https://djcapp.game.qq.com/daoju/igw/main/?_service=buy.plug.swoole.judou&iAppId=1001&_app_id=1003&_output_fmt=1&_plug_id=9800&_from=app&iGoodsSeqId=" + iGoodsSeqId + "&iActionId=9002&iActionType=26&_biz_code=nba2k2&biz=nba2k2&iZone=30&lRoleId=" + roleId + "&rolename=" + roleName + "&p_tk=" + c.Ptk + "&_cs=2&sDeviceID=" + DeviceId + "&djcRequestId=" + DeviceId + "-" + strconv.Itoa(int(timestamp)) + "-" + CreateRandomString(3) + "&appVersion=156&p_tk=" + c.Ptk + "&osVersion=Android-28&ch=10003&sVersionName=v4.8.0.0&appSource=android&sDjcSign=" + sign
 	result, err = c.httpGet(url1)
 	if err != nil {
 		log.Println("兑换道具失败")
 		return
 	}
 	log.Println("兑换道具成功", string(result))
+}
+
+// 每日抽奖
+func (c *Client) lottery() {
+	result, err := c.djcGet("welink.usertask.swoole", "lottery_usertask", "", false)
+	if err != nil {
+		log.Println("执行每日抽奖失败")
+		return
+	}
+	ret := jsoniter.Get(result, "ret").ToInt()
+	if ret == -1 {
+		log.Println(jsoniter.Get(result, "sMsg").ToString())
+	} else if ret == 0 {
+		sTask := jsoniter.Get(result, "data", "data", "sTask").ToString()
+		lUin := jsoniter.Get(result, "data", "data", "lUin").ToString()
+		if sTask == "幸运任务" {
+			//领取
+			iRuleId := jsoniter.Get(result, "data", "data", "iruleId").ToString()
+			c.receiveTask(iRuleId)
+		} else {
+			log.Printf("%s今天抽到的任务为:%s,自动跳过\n", lUin, sTask)
+		}
+	} else {
+		log.Println("每日抽奖返回结果异常,请检查", string(result))
+	}
 }
