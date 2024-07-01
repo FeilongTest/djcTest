@@ -80,18 +80,18 @@ type TaskList struct {
 					Num        string `json:"num"`
 					Giftid     int    `json:"giftid"`
 				} `json:"sReward"`
-				ICompleteNum string `json:"iCompleteNum"`
-				Iroleinfo    string `json:"iroleinfo"`
-				DtStart      string `json:"dtStart"`
-				DtEnd        string `json:"dtEnd"`
-				ITaskType    string `json:"iTaskType"`
-				SExt3        string `json:"sExt3"`
-				DtComplete   string `json:"dtComplete"`
-				DtReceive    string `json:"dtReceive"`
-				DtDeadline   string `json:"dtDeadline"`
-				DtCommit     string `json:"dtCommit"`
-				IsNew        int    `json:"isNew"`
-				TaskStatus   int    `json:"task_status"`
+				ICompleteNum string      `json:"iCompleteNum"`
+				Iroleinfo    string      `json:"iroleinfo"`
+				DtStart      string      `json:"dtStart"`
+				DtEnd        string      `json:"dtEnd"`
+				ITaskType    string      `json:"iTaskType"`
+				SExt3        string      `json:"sExt3"`
+				DtComplete   string      `json:"dtComplete"`
+				DtReceive    string      `json:"dtReceive"`
+				DtDeadline   string      `json:"dtDeadline"`
+				DtCommit     string      `json:"dtCommit"`
+				IsNew        int         `json:"isNew"`
+				TaskStatus   interface{} `json:"task_status"`
 			} `json:"limit_time"`
 			Game interface{} `json:"game"`
 		} `json:"list"`
